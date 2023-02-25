@@ -1,0 +1,30 @@
+{
+    "name": "mdzahid/laravel-slug-generator",
+    "description": "This package is a simple laravel slug generator package",
+    "type": "composer-plugin",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Mdzahid\\LaravelSlugGenerator\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Md Zahidul Islam",
+            "email": "mdzahid.pro@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.*"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mdzahid\\LaravelSlugGenerator\\Providers\\GenerateSlugServiceProvider"
+            ],
+            "aliases": {
+                "PaymentGateway": "Mdzahid\\LaravelSlugGenerator\\Facades\\GenerateSlug"
+            }
+        }
+    }
+}
