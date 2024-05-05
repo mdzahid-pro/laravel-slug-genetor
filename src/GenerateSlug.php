@@ -3,6 +3,7 @@
 namespace Mdzahid\LaravelSlugGenerator;
 
 use Arr;
+use Illuminate\Support\Str;
 use Str;
 
 class GenerateSlug
@@ -13,43 +14,27 @@ class GenerateSlug
         $is_module = false,
         $module_name = null,
         $column_name = 'slug'
-    ): string  // Idea from Suzon extended by Md Zahid
-    {
+    ): string {
         // Use CamelCase for Model and Module Name
         $model_path = $is_module ? 'Modules\\' . ucwords($module_name) . '\Entities\\' . ucwords($model_name) :
             '\App\Models\\' . ucwords($model_name);
 
         $slug = Str::slug($sluggable_text, config("generate-slug.separator"));
-        $check = true;
 
-        do {
-            $old_collection = (new $model_path())->where($column_name, $slug)
-                ->orderBy('id', 'DESC')->first();
+        // Check if the slug already exists
+        $existingSlug = (new $model_path())->where($column_name, $slug)->exists();
 
-            if ($old_collection != null) {
-                $old_collection_name = $old_collection->$column_name;
-                $exploded = explode('-', $old_collection_name);
+        if ($existingSlug) {
+            // If the slug exists, append a numeric suffix
+            $suffix = 1;
+            do {
+                $newSlug = $slug . '-' . $suffix;
+                $existingSlug = (new $model_path())->where($column_name, $newSlug)->exists();
+                $suffix++;
+            } while ($existingSlug);
 
-                if (array_key_exists(1, $exploded)) {
-                    $number = end($exploded);
-
-                    if (is_numeric($number)) {
-                        $number = (int)$number;
-                        array_pop($exploded);
-
-                        $final_array = array_merge($exploded, Arr::wrap(++$number));
-
-                        $slug = implode('-', $final_array);
-                    } else {
-                        $slug .= '-1';
-                    }
-                } else {
-                    $slug .= '-1';
-                }
-            } else {
-                $check = false;
-            }
-        } while ($check);
+            return $newSlug;
+        }
 
         return $slug;
     }
