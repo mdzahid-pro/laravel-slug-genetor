@@ -1,1 +1,1 @@
-# Laravel Slug Generator 
+# Laravel Slug Generator Installation Process
